@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- size of screen to switch between linearlayout and gridlayout -->
+    <integer name="gridview_minwidth_dp">600</integer>
+
+    <!-- size of the cardviews for calculating column count in gridview -->
+    <integer name="cardview_minwidth_dp">200</integer>
+</resources>

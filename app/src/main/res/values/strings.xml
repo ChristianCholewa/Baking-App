@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Baking Time</string>
+
+    <!-- Bundle key identifier for loader -->
+    <string name="LOADER_BUNDLE_URL">LOADER_BUNDLE_URL</string>
+
+    <!-- JSON source URL -->
+    <string name="source_url">https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json</string>
+
+    <!-- contentDescription recipe bitmap -->
+    <string name="rv_item_image_description">Recipe image</string>
+
+    <!-- error screens -->
+    <string name="error_message">Error fetching data from server.</string>
+    <string name="detail_error_message">No details available.</string>
+
+    <!-- Recipe list -->
+    <string name="recipe_servings">Servings: </string>
+
+    <!-- fragment titles -->
+    <string name="detail_ingredient_titel">Ingredients</string>
+    <string name="detail_step">Step</string>
+    <string name="detail_introduction">Introduction</string>
+
+    <!-- Ingredients fragment -->
+    <string name="no_ingredients_in_list">No ingredients needed!</string>
+
+    <!-- step navigation -->
+    <string name="step_button_previous">Previous</string>
+    <string name="step_button_Next">Next</string>
+    <string name="step_button_Close">Close</string>
+
+    <!-- widget -->
+    <string name="appwidget_text">Baking Time</string>
+    <string name="add_widget">Add widget</string>
+
+</resources>
