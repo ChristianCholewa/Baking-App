@@ -26,6 +26,8 @@ public class StepActivity extends AppCompatActivity {
     @BindView(R.id.button_forward) Button buttonForward;
     @BindView(R.id.button_back) Button buttonBack;
 
+    private static final String BUNDLE_RECIPE = "BUNDLE_RECIPE";
+    private static final String BUNDLE_STEP = "BUNDLE_STEP";
     private Recipe recipe;
     private int selectedStep;
 
@@ -36,33 +38,43 @@ public class StepActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        // make sure extras are set
-        Intent intent = getIntent();
-        if (intent == null) {
-            Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        } else if (!intent.hasExtra(Recipe.EXTRA_RECIPE_DATA)) {
-            Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        } else if (!intent.hasExtra(Recipe.EXTRA_RECIPE_STEP)) {
-            Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        } else {
-            recipe = intent.getParcelableExtra(Recipe.EXTRA_RECIPE_DATA);
-            selectedStep = intent.getIntExtra(Recipe.EXTRA_RECIPE_STEP, 0);
-        }
-
         // don't do all this if devices is only rotated
         if(savedInstanceState == null) {
             Log.i(LOG_TAG, "Creating new fragment");
 
+            // make sure extras are set
+            Intent intent = getIntent();
+            if (intent == null) {
+                Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            } else if (!intent.hasExtra(Recipe.EXTRA_RECIPE_DATA)) {
+                Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            } else if (!intent.hasExtra(Recipe.EXTRA_RECIPE_STEP)) {
+                Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            } else {
+                recipe = intent.getParcelableExtra(Recipe.EXTRA_RECIPE_DATA);
+                selectedStep = intent.getIntExtra(Recipe.EXTRA_RECIPE_STEP, 0);
+            }
+
             activateFragment(true);
+        } else {
+            selectedStep = savedInstanceState.getInt(BUNDLE_STEP);
+            recipe =savedInstanceState.getParcelable(BUNDLE_RECIPE);
         }
 
         setTextOfButtons();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(BUNDLE_STEP, selectedStep);
+        outState.putParcelable(BUNDLE_RECIPE, recipe);
     }
 
     private void setTextOfButtons(){
