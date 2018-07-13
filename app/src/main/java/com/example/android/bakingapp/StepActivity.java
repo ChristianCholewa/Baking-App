@@ -36,39 +36,36 @@ public class StepActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        // make sure extras are set
+        Intent intent = getIntent();
+        if (intent == null) {
+            Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        } else if (!intent.hasExtra(Recipe.EXTRA_RECIPE_DATA)) {
+            Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        } else if (!intent.hasExtra(Recipe.EXTRA_RECIPE_STEP)) {
+            Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        } else {
+            recipe = intent.getParcelableExtra(Recipe.EXTRA_RECIPE_DATA);
+            selectedStep = intent.getIntExtra(Recipe.EXTRA_RECIPE_STEP, 0);
+        }
+
         // don't do all this if devices is only rotated
         if(savedInstanceState == null) {
             Log.i(LOG_TAG, "Creating new fragment");
 
-            // make sure extras are set
-            Intent intent = getIntent();
-            if (intent == null) {
-                Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            } else if (!intent.hasExtra(Recipe.EXTRA_RECIPE_DATA)) {
-                Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            } else if (!intent.hasExtra(Recipe.EXTRA_RECIPE_STEP)) {
-                Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            } else {
-                recipe = intent.getParcelableExtra(Recipe.EXTRA_RECIPE_DATA);
-                selectedStep = intent.getIntExtra(Recipe.EXTRA_RECIPE_STEP, 0);
-            }
-
             activateFragment(true);
         }
+
+        setTextOfButtons();
     }
 
-    private void activateFragment(boolean addFragment){
-
-        //title of activity
-        setTitle(Helper.getTitle(this, recipe.getName(), selectedStep));
-
-        //buttons
+    private void setTextOfButtons(){
         if(selectedStep == 0){
             buttonForward.setText(getString(R.string.step_button_Next));
             buttonBack.setText(getString(R.string.step_button_Close));
@@ -78,7 +75,13 @@ public class StepActivity extends AppCompatActivity {
         } else {
             buttonForward.setText(getString(R.string.step_button_Next));
             buttonBack.setText(getString(R.string.step_button_previous));
-        }
+        }        
+    }
+    
+    private void activateFragment(boolean addFragment){
+
+        //title of activity
+        setTitle(Helper.getTitle(this, recipe.getName(), selectedStep));
 
         //choose fragment
         Fragment fragment;
@@ -108,6 +111,8 @@ public class StepActivity extends AppCompatActivity {
 
     @OnClick(R.id.button_back)
     public void onButtonBack(View view) {
+        Log.d(LOG_TAG, "onButtonBack");
+
         if(selectedStep == 0){
             finish();
             return;
@@ -115,10 +120,13 @@ public class StepActivity extends AppCompatActivity {
 
         selectedStep--;
         activateFragment(false);
+        setTextOfButtons();
     }
 
     @OnClick(R.id.button_forward)
     public void onButtonForward(View view) {
+        Log.d(LOG_TAG, "onButtonForward");
+
         if(selectedStep == recipe.getStepList().size() - 1){
             finish();
             return;
@@ -126,6 +134,7 @@ public class StepActivity extends AppCompatActivity {
 
         selectedStep++;
         activateFragment(false);
+        setTextOfButtons();
     }
 
     // make home button act as back button

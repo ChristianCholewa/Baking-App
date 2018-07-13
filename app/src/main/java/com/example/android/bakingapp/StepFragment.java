@@ -42,7 +42,14 @@ public class StepFragment extends Fragment {
 
     private static final String LOG_TAG = StepFragment.class.getSimpleName();
 
+    private static final String BUNDLE_POSITION = "BUNDLE_POSITION";
+    private static final String BUNDLE_PLAYSTATE = "BUNDLE_PLAYSTATE";
+
     private SimpleExoPlayer simpleExoPlayer;
+    private String videoURLString;
+    private boolean playWhenReady;
+    private long playerPosition;
+
     private Context context;
 
     public StepFragment(){}
@@ -59,6 +66,7 @@ public class StepFragment extends Fragment {
 
         Bundle bundle = this.getArguments();
         if(bundle != null) {
+            Log.d(LOG_TAG, "this.getArguments() != null");
 
             Recipe recipe = bundle.getParcelable(Recipe.EXTRA_RECIPE_DATA);
             if(recipe != null) {
@@ -73,10 +81,9 @@ public class StepFragment extends Fragment {
                     description.setVisibility(View.GONE);
                 }
 
-                String videoURLString = step.getVideoUrl();
-                if(!TextUtils.isEmpty(videoURLString)) {
-                    initializePlayer(Uri.parse(videoURLString));
-                } else {
+                videoURLString = step.getVideoUrl();
+
+                if(TextUtils.isEmpty(videoURLString)) {
                     playerView.setVisibility(View.GONE);
                 }
 
@@ -87,6 +94,15 @@ public class StepFragment extends Fragment {
                     thumbnail.setVisibility(View.GONE);
                 }
             }
+        }
+
+        if(savedInstanceState != null){
+            playWhenReady = savedInstanceState.getBoolean(BUNDLE_PLAYSTATE);
+            playerPosition = savedInstanceState.getLong(BUNDLE_POSITION);
+
+        } else {
+            playWhenReady = true;
+            playerPosition = 0;
         }
 
         return rootView;
@@ -104,8 +120,10 @@ public class StepFragment extends Fragment {
             MediaSource mediaSource = new ExtractorMediaSource.Factory(new DefaultDataSourceFactory(context, userAgent)).createMediaSource(mediaUri);
 
             simpleExoPlayer.prepare(mediaSource);
-            simpleExoPlayer.setPlayWhenReady(true);
         }
+
+        simpleExoPlayer.seekTo(playerPosition);
+        simpleExoPlayer.setPlayWhenReady(playWhenReady);
     }
 
     private void releasePlayer() {
@@ -116,11 +134,56 @@ public class StepFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            if(!TextUtils.isEmpty(videoURLString)) {
+                initializePlayer(Uri.parse(videoURLString));
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Util.SDK_INT <= 23 || simpleExoPlayer == null) {
+            if(!TextUtils.isEmpty(videoURLString)) {
+                initializePlayer(Uri.parse(videoURLString));
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
     @Override public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        releasePlayer();
 
         Log.d(LOG_TAG, "onDestroyView");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(LOG_TAG, "onSaveInstanceState");
+
+        if (simpleExoPlayer != null) {
+            outState.putLong(BUNDLE_POSITION, simpleExoPlayer.getCurrentPosition());
+            outState.putBoolean(BUNDLE_PLAYSTATE, simpleExoPlayer.getPlayWhenReady());
+        }
     }
 }
