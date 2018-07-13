@@ -158,6 +158,9 @@ public class StepFragment extends Fragment {
     public void onPause() {
         super.onPause();
         if (Util.SDK_INT <= 23) {
+            playerPosition = simpleExoPlayer.getCurrentPosition();
+            playWhenReady = simpleExoPlayer.getPlayWhenReady();
+            
             releasePlayer();
         }
     }
@@ -166,6 +169,9 @@ public class StepFragment extends Fragment {
     public void onStop() {
         super.onStop();
         if (Util.SDK_INT > 23) {
+            playerPosition = simpleExoPlayer.getCurrentPosition();
+            playWhenReady = simpleExoPlayer.getPlayWhenReady();
+
             releasePlayer();
         }
     }
